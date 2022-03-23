@@ -1,14 +1,17 @@
 -- Projet BIKE / DeSIGeo / ENSG
--- 2021-2022
+-- 2021-2022  -- Mars 2022
 -- Pascal Vuylsteker et David Delord
-
--- Alimentation de PostgreSQL par QGIS, après export pour conversion de SRID
--- BDD de départ : france-20220301_Lambert93.geojson (was france-20211201.geojson) passé par QGis pour être stocké dans bike.geovelo
+---------------------------------------
 
 -- ATTENTION
 -- Suite aux tests réalisés en mars 2022, nous avons découvert des erreur dans les champs ame.
 -- Nous avons de fait décidé de revenir au fichier source france-20211201.geojson de décembre 2021
 -- et de réaliser l'ensemble de nos opérations à partir de ce fichier
+-- les valeurs correctes estimées sont prefixées de 'was'
+
+-- Alimentation de PostgreSQL par QGIS, après export pour conversion de SRID
+-- BDD de départ : france-20220301_Lambert93.geojson (was france-20211201.geojson) passé par QGis pour être stocké dans bike.geovelo
+
 
 
 -- Exploration initial du jeu de donnée
@@ -18,9 +21,9 @@ SELECT SUM(ST_length(geom)) FROM bike.geovelo;  -- 62 651 601.08 (was 61 862 994
 SELECT ST_length(geom) FROM bike.geovelo;
 SELECT ST_length(geom), id_osm FROM bike.geovelo ORDER BY ST_length(geom) DESC LIMIT 100;
 
-SELECT COUNT(DISTINCT(code_com_d)) FROM bike.geovelo -- 12521 (was 13159)
-SELECT COUNT(DISTINCT(code_com_g)) FROM bike.geovelo
- -- 12505 (was 13153)
+SELECT COUNT(DISTINCT(code_com_d)) FROM bike.geovelo -- 12521 (was 13159)  -- new_dec_2021 13158
+SELECT COUNT(DISTINCT(code_com_g)) FROM bike.geovelo  -- 12505 (was 13153) -- new_dec_2021 13152
+
 
 -- Au 1er janvier 2022 , la France compte 34 954 communes dont 34 825 en France métropolitaine et 129 dans les DOM
 -- Nombre total de communes en contact avec des aménagements cyclables : 12609 sur 34954 (34825  hors DOM): 36% de communes ont des aménagement cyclables
@@ -30,9 +33,9 @@ SELECT COUNT(DISTINCT(code_com2)) FROM (
 UNION
 	SELECT code_com_g AS code_com 
 	FROM bike.geovelo 	
-) AS code_com2;        -- 12609
+) AS code_com2;        -- 12609     -- new_dec_2021 13230
 
-
+--- -- new_dec_2021 XXXXXXX
 
 -- Table des longueurs de segment, pour export et traitement dans Tableau
 DROP TABLE IF EXISTS bike.geovelo_with_length;
@@ -40,8 +43,8 @@ CREATE TABLE bike.geovelo_with_length AS (
 	SELECT *, round((ST_length(geom)*100))/100 AS longueur
 	FROM bike.geovelo gg 
 );
-COPY bike.geovelo_with_length TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/france-20220301.csv' DELIMITER ',' CSV HEADER; 
--- COPY bike.geovelo_with_length TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/france-20211201.csv' DELIMITER ',' CSV HEADER; 
+-- COPY bike.geovelo_with_length TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/france-20220301.csv' DELIMITER ',' CSV HEADER; 
+COPY bike.geovelo_with_length TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/france-20211201.csv' DELIMITER ',' CSV HEADER; 
 
 -- Table des points extrémités, pour export et traitement dans Tableau
 DROP TABLE IF EXISTS bike.geovelo_ext_points;
