@@ -20,10 +20,13 @@
 
 
 -- Exploration initial du jeu de donnée
-SELECT postgis_full_version ();  -- Testé avec POSTGIS="3.1.3 008d2db" [EXTENSION] PGSQL="140" GEOS="3.9.1-CAPI-1.14.2" PROJ="8.0.0" LIBXML="2.9.10" LIBJSON="0.15"
-SELECT COUNT(*) FROM bike.geovelo; -- 303880 (was 318852 segements : GeoVelo à ajouter certainnes contraintes sur l'export qui a réduit la quantité de segment)
+SELECT postgis_full_version ();  -- Travail réalisé avec POSTGIS="3.1.3 008d2db" [EXTENSION] PGSQL="140" GEOS="3.9.1-CAPI-1.14.2" PROJ="8.0.0" LIBXML="2.9.10" LIBJSON="0.15"
+-- SQL_1.1
+SELECT COUNT(*) FROM bike.geovelo; -- 303880 (was 318852 segements : GeoVelo a ajouté certainnes contraintes sur l'export qui a réduit la quantité de segment)
+-- SQL_1.2
 SELECT SUM(ST_length(geom)) FROM bike.geovelo;  -- 62 651 601.08 (was 61 862 994.64188122 devrait être 73 406 000 m)
 SELECT ST_length(geom) FROM bike.geovelo;
+-- SQL_1.3
 SELECT ST_length(geom), id_osm FROM bike.geovelo ORDER BY ST_length(geom) DESC LIMIT 100;
 
 SELECT COUNT(DISTINCT(code_com_d)) FROM bike.geovelo -- 12521 (was 13159)  -- new_dec_2021 13158
@@ -31,7 +34,9 @@ SELECT COUNT(DISTINCT(code_com_g)) FROM bike.geovelo  -- 12505 (was 13153) -- ne
 
 
 -- Au 1er janvier 2022 , la France compte 34 954 communes dont 34 825 en France métropolitaine et 129 dans les DOM
+-- https://fr.wikipedia.org/wiki/Liste_des_communes_nouvelles_cr%C3%A9%C3%A9es_en_2022
 -- Nombre total de communes en contact avec des aménagements cyclables : 12609 sur 34954 (34825  hors DOM): 36% de communes ont des aménagement cyclables
+-- SQL_1.4
 SELECT COUNT(DISTINCT(code_com2)) FROM (
 	SELECT code_com_d AS code_com 
 	FROM bike.geovelo 		
@@ -43,15 +48,18 @@ UNION
 --- -- new_dec_2021 XXXXXXX
 
 -- Table des longueurs de segment, pour export et traitement dans Tableau
+-- SQL_2.1.1
 DROP TABLE IF EXISTS bike.geovelo_with_length;
 CREATE TABLE bike.geovelo_with_length AS (
 	SELECT *, round((ST_length(geom)*100))/100 AS longueur
 	FROM bike.geovelo gg 
 );
 -- COPY bike.geovelo_with_length TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/france-20220301.csv' DELIMITER ',' CSV HEADER; 
-COPY bike.geovelo_with_length TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/france-20211201.csv' DELIMITER ',' CSV HEADER; 
+-- COPY bike.geovelo_with_length TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/france-20211201.csv' DELIMITER ',' CSV HEADER; 
+COPY bike.geovelo_with_length TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/BIKE_DeSIGeo_git/etl/france-20211201.csv' DELIMITER ',' CSV HEADER; 
 
 -- Table des points extrémités, pour export et traitement dans Tableau
+-- SQL_2.1.2
 DROP TABLE IF EXISTS bike.geovelo_ext_points;
 CREATE TABLE bike.geovelo_ext_points AS (
 	SELECT 	id, id_osm, round((ST_length(geom)*100))/100 AS longueur,
@@ -61,10 +69,11 @@ CREATE TABLE bike.geovelo_ext_points AS (
 		ST_EndPoint(geom) AS endtpoint
 	FROM bike.geovelo gg 
 );
-COPY bike.geovelo_ext_points TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/france-20220301-ext-points.csv' DELIMITER ',' CSV HEADER; 
+-- COPY bike.geovelo_ext_points TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/france-20220301-ext-points.csv' DELIMITER ',' CSV HEADER; 
+COPY bike.geovelo_ext_points TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/BIKE_DeSIGeo_git/etl/france-20211201-ext-points.csv' DELIMITER ',' CSV HEADER; 
 
  
- 
+-- SQL_2.2
 --- Question sur la longueur des segments
 -- Line de longueur mal évaluées (moins de 0.1 m)  -- 4 (was 337 segments sont concernés en decembre)
 SELECT ST_length(geom), id_osm, geom FROM bike.geovelo 
@@ -87,12 +96,14 @@ SELECT ST_length(geom), id_osm, geom FROM bike.geovelo
 WHERE  (ST_length(geom) >=10000)
 ORDER BY ST_length(geom) ASC;
 
---- End Debug
+--- End Partie exploratoire préliminaire
+
 
 -- Budget des communes telechargée de impot.gouv. Compilation réalisée par Christian Quest
 -- https://www.data.gouv.fr/fr/datasets/comptes-individuels-des-communes
 -- http://data.cquest.org/dgfip_comptes_collectivites/communes/
 -- Dernière année disponible : 2018
+-- SQL_3.1.1
 DROP TABLE IF EXISTS bike.budget;
 CREATE TABLE bike.budget 
 (annee INTEGER, dep varchar(3), depcom varchar(5), commune varchar(64), population INTEGER, 
@@ -108,8 +119,10 @@ taxe_add_non_bati_base INTEGER, cotis_fonciere_entreprises INTEGER, cotis_foncie
 impot_forfait_entreprise_reseau INTEGER, taxe_surf_commerciales INTEGER, compensation_relais_2010 INTEGER, taxe_professionnelle INTEGER, 
 taxe_professionnelle_base INTEGER, produits_fonctionnement_caf INTEGER, charges_fonctionnement_caf INTEGER, encours_bancaire_net_solde_fonds_toxiques INTEGER)
 
-COPY bike.budget FROM '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/2018.csv' DELIMITER ',' CSV HEADER; 
+-- COPY bike.budget FROM '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/2018.csv' DELIMITER ',' CSV HEADER; 
+COPY bike.budget FROM '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/BIKE_DeSIGeo_git/src/2018.csv' DELIMITER ',' CSV HEADER; 
 
+-- SQL_3.1.2
 SELECT COUNT(*) FROM bike.budget; -- 35595 communes en 2018
 -- Au 1er janvier 2022 , la France compte 34 954 communes dont 34 825 en France métropolitaine et 129 dans les DOM
 SELECT annee, dep, depcom, commune, population, produits_total FROM bike.budget;
