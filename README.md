@@ -15,6 +15,12 @@ Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
 
 Ces fichiers ont été intégré dans git via l'outil "[Git Large File Storage](https://docs.github.com/en/repositories/working-with-files/managing-large-files)"
 
+## Rep src/insee [Fichiers INSEE](https://www.insee.fr/fr/information/5057840)
+- Ensemble des différents niveau
+  - [src/insee/cog_ensemble_2021_csv/](src/insee/cog_ensemble_2021_csv/)
+- Départements
+  - [src/insee/cog_ensemble_2021_csv/departement2021.csv](src/insee/cog_ensemble_2021_csv/departement2021.csv) 
+
 
 # Rep sql : Scripts SQL
 - ETL SQL principal : L'ensemble des instructions de création des tables : 
