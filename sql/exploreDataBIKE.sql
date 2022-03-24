@@ -1,17 +1,22 @@
+---------------------------------------
 -- Projet BIKE / DeSIGeo / ENSG
--- 2021-2022  -- Mars 2022
+-- 2021-2022      --     Mars 2022
 -- Pascal Vuylsteker et David Delord
 ---------------------------------------
+-- Analyse des amaganements cyclable décrit dans la BNAC
+-- Base Nationale des Aménagements Cyclables
+-- Exportée à partir de openstreetmap par Geovelo
 
 -- ATTENTION
--- Suite aux tests réalisés en mars 2022, nous avons découvert des erreur dans les champs ame.
+-- Suite aux tests réalisés en mars 2022, nous avons découvert des erreur dans les champs ame
+-- du fichier produit par Geovelo.
 -- Nous avons de fait décidé de revenir au fichier source france-20211201.geojson de décembre 2021
 -- et de réaliser l'ensemble de nos opérations à partir de ce fichier
--- les valeurs correctes estimées sont prefixées de 'was'
+-- les valeurs correctes estimées sont prefixées de 'was' ou '-- new_dec_2021'
 
 -- Alimentation de PostgreSQL par QGIS, après export pour conversion de SRID
 -- BDD de départ : france-20220301_Lambert93.geojson (was france-20211201.geojson) passé par QGis pour être stocké dans bike.geovelo
-
+-- Source: https://transport.data.gouv.fr/datasets/amenagements-cyclables-france-metropolitaine/
 
 
 -- Exploration initial du jeu de donnée
