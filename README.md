@@ -8,7 +8,7 @@ Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
 Ces fichiers ont été intégré dans git via l'outil "[Git Large File Storage](https://docs.github.com/en/repositories/working-with-files/managing-large-files)"
 
 # Rep sql : Scripts SQL
-- ETL SQL principal : L'ensemble des instruction de creation des tables : [exploreDataBIKE.sql](sql/exploreDataBIKE.sql)
+- ETL SQL principal : L'ensemble des instructions de création des tables : [exploreDataBIKE.sql](sql/exploreDataBIKE.sql)
 
 # Rep etl : Fichiers Intermédiaires de Transformation
 
