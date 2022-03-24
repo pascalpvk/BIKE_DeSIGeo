@@ -11,5 +11,6 @@ Ces fichiers ont été intégré dans git via l'outil "[Git Large File Storage](
 - ETL SQL principal : L'ensemble des instructions de création des tables : [exploreDataBIKE.sql](sql/exploreDataBIKE.sql)
 
 # Rep etl : Fichiers Intermédiaires de Transformation
+- Table des longueurs de segment, pour export et traitement dans Tableau (réécriture en CSV du fichier BNAC / Geovelo) : [france-20211201.csv](etl/france-20211201.csv)
 
 # Rep out : Fichiers de résultat
