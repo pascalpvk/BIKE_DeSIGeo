@@ -206,7 +206,7 @@ SELECT COUNT(*) FROM bike.geovelo; -- 303880 segments (was 318 852)
 -----------------------------------------------------------------------------------------	
 -- Associations de AME / Groupement par couple d'amenagement dans table geovelo_two_sides
 -- 
--- SQL_6.1
+-- SQL_6.1.1
 DROP TABLE IF EXISTS bike.geovelo_two_sides;
 CREATE TABLE bike.geovelo_two_sides AS (
 	SELECT COUNT(*) AS nombre, CAST(round(COUNT(*)*10000/(SELECT valeur FROM bike.resultats WHERE ref = 'fr_total_seg'))/100 AS DOUBLE PRECISION) AS pourcent_seg,
@@ -220,6 +220,7 @@ CREATE TABLE bike.geovelo_two_sides AS (
 SELECT * FROM bike.geovelo_two_sides ORDER BY longueur DESC;
 SELECT * FROM bike.geovelo gg WHERE ((gg.ame_g = 'PISTE CYCLABLE') AND (gg.ame_d LIKE 'PISTE CYCLABLE'));
 SELECT * FROM bike.geovelo gg WHERE ((gg.ame_g IS NULL) AND (gg.ame_d IS NULL));
+SELECT * FROM bike.geovelo gg WHERE ((gg.ame_g IS NULL) OR (gg.ame_d IS NULL));
 
 
 
@@ -228,6 +229,7 @@ SELECT * FROM bike.geovelo gg WHERE ((gg.ame_g IS NULL) AND (gg.ame_d IS NULL));
 
 -- Association des AME G+D + GROUP BY sens_d et sens_g  dans table geovelo_two_sides_and_sens
 -- Pour exploration data uniquement
+-- SQL_6.1.2
 DROP TABLE IF EXISTS bike.geovelo_two_sides_and_sens;
 CREATE TABLE bike.geovelo_two_sides_and_sens AS (
 	SELECT COUNT(*) AS nombre, CAST(round(COUNT(*)*10000/(SELECT valeur FROM bike.resultats WHERE ref = 'fr_total_seg'))/100 AS DOUBLE PRECISION) AS pourcent_seg,
@@ -238,11 +240,17 @@ CREATE TABLE bike.geovelo_two_sides_and_sens AS (
 	GROUP BY gg.ame_g, gg.sens_g, gg.ame_d, gg.sens_d, reseau_loc
 	ORDER BY SUM(ST_length(geom)) DESC
 );
+SELECT * FROM bike.geovelo_two_sides_and_sens b 
+	WHERE ((b.sens_g NOT LIKE 'UNIDIRECTIONNEL') OR (b.sens_d NOT LIKE 'UNIDIRECTIONNEL')) 
+	ORDER BY longueur DESC;
+SELECT * FROM bike.geovelo_two_sides_and_sens b 
+	ORDER BY longueur DESC;
 
 
 -- Exploration un coté à la fois
 -- Separation Gauche Droite
 -- GGG junction ame, sens, code_com à gauche GAUCHE
+-- SQL_6.2.1
 DROP TABLE IF EXISTS bike.geovelo_simple_cote;
 CREATE TABLE bike.geovelo_simple_cote AS (
 	SELECT COUNT(*) AS nombre,
@@ -253,9 +261,10 @@ CREATE TABLE bike.geovelo_simple_cote AS (
 	ORDER BY SUM(ST_length(geom)) DESC
 );
 -- Nombre de junction ame, sens, code_com à gauche
-SELECT COUNT(*) FROM bike.geovelo_simple_cote; -- 33977 (was 33718)
+SELECT COUNT(*) FROM bike.geovelo_simple_cote; -- 33977 (was 33 718)
 
--- DDD junction ame, sens, code_com à droite DROITE
+-- DDD junction ame, sens, code_com à droite DROITE PAR COMMUNE!
+-- SQL_6.2.2
 DROP TABLE IF EXISTS bike.geovelo_simple_cote;
 CREATE TABLE bike.geovelo_simple_cote AS (
 	SELECT COUNT(*) AS nombre,
@@ -268,7 +277,8 @@ CREATE TABLE bike.geovelo_simple_cote AS (
 -- Nombre de junction ame, sens, code_com à droite
 SELECT COUNT(*) FROM bike.geovelo_simple_cote; -- 30089 (was 29748)
 
--- UNION des deux cotés Ajout des deux cotés dans une table unique
+-- UNION des deux cotés Ajout des deux cotés dans une table unique PAR COMMUNE
+-- SQL_6.2.3
 DROP TABLE IF EXISTS bike.geovelo_simple_cote;
 CREATE TABLE bike.geovelo_simple_cote AS (
 	SELECT COUNT(*) AS nombre,
@@ -286,6 +296,11 @@ CREATE TABLE bike.geovelo_simple_cote AS (
 SELECT COUNT(*) FROM bike.geovelo_simple_cote; -- 64066 (was 63466)
 -- verification : total = G + D
 
+SELECT SUM(nombre) AS nb_segment, SUM(longueur) AS longueur_total FROM bike.geovelo_simple_cote;
+-- verification : nbsegment coté 637 704  / longueur 123 725 990.0800002
+
+-- XXXXXX AREVOIR A PARTIR d'ICI XXXX
+
 -- nettoyage des segments de type "aucun" -- DELETE 6986   -- près de 7000 segment avec un seul coté 
 -- 6986/63466*100 = 11% des routes ne présente un améganement que de 1 coté
 -- 6986/318852*100
@@ -300,7 +315,7 @@ UPDATE bike.geovelo_simple_cote SET lineaire = longueur WHERE sens='UNIDIRECTION
 UPDATE bike.geovelo_simple_cote SET lineaire = (longueur*2) WHERE sens='BIDIRECTIONNEL';
 
 SELECT * FROM bike.geovelo_simple_cote;
-SELECT count(*) FROM bike.geovelo_simple_cote; -- mars22 : 57048 
+SELECT count(*) FROM bike.geovelo_simple_cote; -- mars22 : 57048   -- new_dec_2021 56480
 
 ----  CONTROLER A PARTIR D"ICI XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 -- à comparer à https://randovelo.touteslatitudes.fr/lineaire-amecycl/
