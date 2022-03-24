@@ -11,15 +11,19 @@ Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
   - [https://www.data.gouv.fr/fr/datasets/comptes-individuels-des-communes](https://www.data.gouv.fr/fr/datasets/comptes-individuels-des-communes)
   - [http://data.cquest.org/dgfip_comptes_collectivites/communes/](http://data.cquest.org/dgfip_comptes_collectivites/communes/)
   - Dernière année disponible : 2018
+  - SQL_3.1.1
 
 Ces fichiers ont été intégré dans git via l'outil "[Git Large File Storage](https://docs.github.com/en/repositories/working-with-files/managing-large-files)"
 
 
 # Rep sql : Scripts SQL
-- ETL SQL principal : L'ensemble des instructions de création des tables : [exploreDataBIKE.sql](sql/exploreDataBIKE.sql)
+- ETL SQL principal : L'ensemble des instructions de création des tables : 
+  - [exploreDataBIKE.sql](sql/exploreDataBIKE.sql)
 
 # Rep etl : Fichiers Intermédiaires de Transformation
-- Table des longueurs de segment, pour export et traitement dans Tableau (réécriture en CSV du fichier BNAC / Geovelo) : [france-20211201.csv](etl/france-20211201.csv) (SQL_2.1.1)
-- Table des points extrémités, pour export et traitement dans Tableau : [etl/france-20211201-ext-points.csv](etl/france-20211201-ext-points.csv)
+- Table des longueurs de segment, pour export et traitement dans Tableau (réécriture en CSV du fichier BNAC / Geovelo) : 
+  - [france-20211201.csv](etl/france-20211201.csv) (SQL_2.1.1)
+- Table des points extrémités, pour export et traitement dans Tableau : 
+  - [etl/france-20211201-ext-points.csv](etl/france-20211201-ext-points.csv)
 
 # Rep out : Fichiers de résultat
