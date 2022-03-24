@@ -129,6 +129,7 @@ SELECT annee, dep, depcom, commune, population, produits_total FROM bike.budget;
 -- communes par département
 SELECT b.dep, COUNT(*) FROM bike.budget b GROUP BY b.dep ORDER BY  b.dep;  -- vérification 101 départments
 
+-- SQL_3.2.1 Budget Total par habitant
 ALTER TABLE bike.budget ADD COLUMN produit_population bigint;  -- budget total par habitant
 SELECT annee, dep, depcom, commune, population, produits_total, cast(1000 as bigint)*produits_total/population AS produit_population
 FROM bike.budget WHERE population>0 ORDER BY produit_population;
@@ -143,6 +144,7 @@ FROM bike.budget WHERE population>0 AND commune = 'ORSAY' ORDER BY produit_popul
 ---- Fin de la partie Budget
 
 ----  DEPARTEMENT (Source INSEE : https://www.insee.fr/fr/information/5057840)
+-- SQL_4.1
 DROP TABLE IF EXISTS bike.departement;
 CREATE TABLE IF NOT EXISTS bike.departement
 (
@@ -157,13 +159,19 @@ CREATE TABLE IF NOT EXISTS bike.departement
 ) TABLESPACE pg_default;
 ALTER TABLE bike.departement
     OWNER to postgres;
-COPY bike.departement FROM '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/insee/cog_ensemble_2021_csv/departement2021.csv' DELIMITER ',' CSV HEADER; 
+COPY bike.departement 
+	FROM '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/BIKE_DeSIGeo_git/src/insee/cog_ensemble_2021_csv/departement2021.csv' 
+	DELIMITER ',' CSV HEADER; 
 
--- SELECT * FROM bike.departement;
+SELECT * FROM bike.departement;
 -- SELECT * FROM bike.departement WHERE nom != nom_long;
 
+
+---------------------------------------------------
 -- Analyse de l'export complet France de Geovelo
 -- Stockage dans bike.resultats
+-- Table de résultats
+-- SQL_5.1
 CREATE TABLE IF NOT EXISTS bike.resultats
 (
     nom character(255) COLLATE pg_catalog."default" NOT NULL,
@@ -171,7 +179,7 @@ CREATE TABLE IF NOT EXISTS bike.resultats
     comment text COLLATE pg_catalog."default",
     ref character varying(16) COLLATE pg_catalog."default" NOT NULL,
     dep character(5) COLLATE pg_catalog."default"
-)
+);
 
 DELETE FROM bike.resultats WHERE ref = 'fr_total_seg';
 INSERT INTO bike.resultats (nom, valeur, comment, ref, dep)
@@ -195,9 +203,10 @@ SELECT COUNT(*) FROM bike.geovelo; -- 303880 segments (was 318 852)
 
 
 	
-	
+-----------------------------------------------------------------------------------------	
 -- Associations de AME / Groupement par couple d'amenagement dans table geovelo_two_sides
 -- 
+-- SQL_6.1
 DROP TABLE IF EXISTS bike.geovelo_two_sides;
 CREATE TABLE bike.geovelo_two_sides AS (
 	SELECT COUNT(*) AS nombre, CAST(round(COUNT(*)*10000/(SELECT valeur FROM bike.resultats WHERE ref = 'fr_total_seg'))/100 AS DOUBLE PRECISION) AS pourcent_seg,
