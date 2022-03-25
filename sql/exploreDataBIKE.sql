@@ -296,13 +296,19 @@ CREATE TABLE bike.geovelo_simple_cote AS (
 SELECT COUNT(*) FROM bike.geovelo_simple_cote; -- 64066 (was 63466)
 -- verification : total = G + D
 
-SELECT SUM(nombre) AS nb_segment, SUM(longueur) AS longueur_total FROM bike.geovelo_simple_cote;
--- verification : nbsegment coté 637 704  / longueur 123 725 990.0800002
+SELECT SUM(nombre) AS nb_lineaire, SUM(longueur) AS longueur_lineaire_total FROM bike.geovelo_simple_cote;
+-- verification : nb_lineaire 637 704  / longueur_lineaire_total 123 725 990.0800002
+-- linéaire (côté) sans aménagement
+SELECT SUM(nombre) AS nb_lineaire, SUM(longueur) AS longueur_lineaire_total 
+	FROM bike.geovelo_simple_cote
+	WHERE ame = 'AUCUN';
 
 -- XXXXXX AREVOIR A PARTIR d'ICI XXXX
 
 -- nettoyage des segments de type "aucun" -- DELETE 6986   -- près de 7000 segment avec un seul coté 
--- 6986/63466*100 = 11% des routes ne présente un améganement que de 1 coté
+-- ERROR : 7000 est le nombre de groupe de segment / commune, pas le nombre de segment
+-- 7000 commune contenait au moins un segment de type "AUCUN"
+-- 6986/63466*100 = 11% des segment d'aménagement ne présente un améganement que de 1 coté
 -- 6986/318852*100
 DELETE FROM bike.geovelo_simple_cote WHERE ame = 'AUCUN';
 ALTER TABLE bike.geovelo_simple_cote ADD COLUMN lineaire double precision;

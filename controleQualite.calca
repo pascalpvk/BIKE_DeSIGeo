@@ -1,0 +1,21 @@
+@fr
+
+# Projet BIKE:DeSIGeo
+
+## Quelques calcul de contrôle de qualité
+
+### Le nombre total de communes en contact avec des aménagements cyclables
+13 230 /  34 825 * 100 => 37,98995
+ 
+ 
+## 
+nbSegments = 318 852
+longueurSegments = 61 862 994,64m
+longueurLineaireAvantNettoyage = 123 725 990m
+nombreLineaireAvantNettoyage = 637 704
+
+longueurSegments*2 => 123 725 989,28 m
+nbSegments*2 => 637 704
+
+nbSegmentsAmeAucun = 6986
+nbSegmentsAmeAucun/nbSegments *100 => 2,19099
