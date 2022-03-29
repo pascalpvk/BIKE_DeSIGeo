@@ -293,23 +293,37 @@ CREATE TABLE bike.geovelo_simple_cote AS (
 	FROM bike.geovelo gg 
 	GROUP BY gg.ame_d, gg.sens_d, gg.code_com_d
 );
-SELECT COUNT(*) FROM bike.geovelo_simple_cote; -- 64066 (was 63466)
--- verification : total = G + D
+SELECT COUNT(*) FROM bike.geovelo_simple_cote; -- 64066 (was 63466)  -- Type d'amenagement par commune
+-- verification : total = G + D 
 
+-- SQL_6.2.4 -- Vérification des totaux (avant nettoyage, les linéaires sont le double des segments)
 SELECT SUM(nombre) AS nb_lineaire, SUM(longueur) AS longueur_lineaire_total FROM bike.geovelo_simple_cote;
 -- verification : nb_lineaire 637 704  / longueur_lineaire_total 123 725 990.0800002
+
 -- linéaire (côté) sans aménagement
+-- SQL_6.2.5 -- dimensions des linéaires qui vont être supprimés (ame = 'AUCUN')
+-- 101696 linéaires supprimés représentant 13 386 728 m de segments dont un coté ne dispose d'AUCUN aménagement
 SELECT SUM(nombre) AS nb_lineaire, SUM(longueur) AS longueur_lineaire_total 
 	FROM bike.geovelo_simple_cote
 	WHERE ame = 'AUCUN';
 
+-- Double vérification sur la table d'origine
+SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueur_seg_un_ame 
+	FROM bike.geovelo
+	WHERE (ame_d = 'AUCUN') OR (ame_g = 'AUCUN');
+
+--SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueur_seg_un_ame 
+SELECT * 
+	FROM bike.geovelo
+	WHERE (ame_d = 'AUCUN') AND (ame_g = 'AUCUN');
+
+
 -- XXXXXX AREVOIR A PARTIR d'ICI XXXX
 
--- nettoyage des segments de type "aucun" -- DELETE 6986   -- près de 7000 segment avec un seul coté 
--- ERROR : 7000 est le nombre de groupe de segment / commune, pas le nombre de segment
--- 7000 commune contenait au moins un segment de type "AUCUN"
--- 6986/63466*100 = 11% des segment d'aménagement ne présente un améganement que de 1 coté
--- 6986/318852*100
+-- nettoyage des segments de type "aucun" -- DELETE 6986   
+-- près de 7000 commune avec des aménagement avec un seul coté 
+-- ERREUR corrigée : 7000 est le nombre de groupe de segment / commune, pas le nombre de segment
+-- 7000 communes contenait au moins un segment de type "AUCUN"
 DELETE FROM bike.geovelo_simple_cote WHERE ame = 'AUCUN';
 ALTER TABLE bike.geovelo_simple_cote ADD COLUMN lineaire double precision;
 -- 

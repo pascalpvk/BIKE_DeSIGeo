@@ -17,5 +17,25 @@ nombreLineaireAvantNettoyage = 637 704
 longueurSegments*2 => 123 725 989,28 m
 nbSegments*2 => 637 704
 
-nbSegmentsAmeAucun = 6986
-nbSegmentsAmeAucun/nbSegments *100 => 2,19099
+nbSegmentsAmeAucunCommune = 6986
+nbSegmentsAmeAucunCommune/nbSegments *100 => 2,19099
+
+nblineaireAmeAucun = 101 696
+longueurLineaireAmeAucun = 13 386 728 m
+
+nblineaireAmeAucun / nombreLineaireAvantNettoyage *100 => 15,94721
+environ 15% de linéaire en nombre d'élément
+longueurLineaireAmeAucun / longueurLineaireAvantNettoyage *100 => 10,81966
+environ 11% de linéaire en longueur
+
+### Il y a plus de sens à donner le pourcentage en fonction des segments
+Il n'existe pas de segment avec ame_d=ame_g = 'AUCUN'
+(En réalité en Décembre 2021, il existait 6 segments caractérisé de tel sorte !)
+Donc on s'intéresse au pourcentage de segments ayant uniquement un coté aucun
+Cf SQL_6.2.5
+
+nblineaireAmeAucun / nbSegments *100 => 31,89442
+environ 32% des segments  en nombre d'élément n'ont un aménagement que d'un coté
+longueurLineaireAmeAucun / longueurLineaireAvantNettoyage *100 => 10,81966
+environ 11% de linéaire en longueur
+
