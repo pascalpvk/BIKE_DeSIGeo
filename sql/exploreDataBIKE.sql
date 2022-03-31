@@ -307,32 +307,53 @@ SELECT SUM(nombre) AS nb_lineaire, SUM(longueur) AS longueur_lineaire_total
 	FROM bike.geovelo_simple_cote
 	WHERE ame = 'AUCUN';
 
--- Double vérification sur la table d'origine
+-- SQL_6.2.5.2 Mise de coté de ces segments pour Potentiellement en tirer une métrique par commune
+DROP TABLE IF EXISTS bike.amenagement_sens_unique;
+CREATE TABLE bike.amenagement_sens_unique AS (
+SELECT * 
+	FROM bike.geovelo_simple_cote
+	WHERE ame = 'AUCUN'
+);
+	
+
+-- Double vérification sur la table d'origine   nb Segment un ame : 101690 -- lineaire = 13 384 852.94 m
+-- SQL_6.2.6
 SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueur_seg_un_ame 
 	FROM bike.geovelo
 	WHERE (ame_d = 'AUCUN') OR (ame_g = 'AUCUN');
 
---SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueur_seg_un_ame 
-SELECT * 
+-- SQL_6.2.7     --  6 segments, longueur linéaire = 1875.03 m, AUCUN à G et à Droite (Bug)
+SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueur_seg_un_ame 
+-- SELECT * 
 	FROM bike.geovelo
 	WHERE (ame_d = 'AUCUN') AND (ame_g = 'AUCUN');
 
+-- SQL_6.2.8 Les Voies Vertes     --  6 segments, longueur linéaire = 1875.03 m, AUCUN à G et à Droite (Bug)
+-- SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueur_seg_un_ame 
+SELECT * 
+	FROM bike.geovelo
+	WHERE (ame_d = 'VOIE VERTE') OR (ame_g = 'VOIE VERTE');
 
--- XXXXXX AREVOIR A PARTIR d'ICI XXXX
 
--- nettoyage des segments de type "aucun" -- DELETE 6986   
+
+
+-- SQL_6.3.1
+-- nettoyage des linéaires de type "aucun" -- DELETE 6986  groupe de segment / commune
 -- près de 7000 commune avec des aménagement avec un seul coté 
 -- ERREUR corrigée : 7000 est le nombre de groupe de segment / commune, pas le nombre de segment
 -- 7000 communes contenait au moins un segment de type "AUCUN"
 DELETE FROM bike.geovelo_simple_cote WHERE ame = 'AUCUN';
-ALTER TABLE bike.geovelo_simple_cote ADD COLUMN lineaire double precision;
--- 
--- ALTER TABLE bike.geovelo_simple_cote ADD COLUMN total_lineaire double precision;
--- ALTER TABLE bike.geovelo_simple_cote ADD COLUMN total_voie double precision;
 
+
+--  Prise en compte des aménagement 'BIDIRECTIONNEL'
+-- On ne parle pas ici des voies vertes, dont la bidirectionalité est reproduite artificillement par
+-- un encodage (ame Gauche/ame Droite)
+-- SQL_6.3.2
+ALTER TABLE bike.geovelo_simple_cote ADD COLUMN lineaire double precision;
 -- lineaire : compte deux fois la longueur de voie quand la voie est BIDIRECTIONNEL
-UPDATE bike.geovelo_simple_cote SET lineaire = longueur WHERE sens='UNIDIRECTIONNEL';
-UPDATE bike.geovelo_simple_cote SET lineaire = (longueur*2) WHERE sens='BIDIRECTIONNEL';
+UPDATE bike.geovelo_simple_cote SET lineaire = longueur WHERE sens='UNIDIRECTIONNEL';  -- 56179
+UPDATE bike.geovelo_simple_cote SET lineaire = (longueur*2) WHERE sens='BIDIRECTIONNEL'; -- 301
+
 
 SELECT * FROM bike.geovelo_simple_cote;
 SELECT count(*) FROM bike.geovelo_simple_cote; -- mars22 : 57048   -- new_dec_2021 56480

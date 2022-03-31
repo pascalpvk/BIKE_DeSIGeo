@@ -36,6 +36,6 @@ Cf SQL_6.2.5
 
 nblineaireAmeAucun / nbSegments *100 => 31,89442
 environ 32% des segments  en nombre d'élément n'ont un aménagement que d'un coté
-longueurLineaireAmeAucun / longueurLineaireAvantNettoyage *100 => 10,81966
-environ 11% de linéaire en longueur
+longueurLineaireAmeAucun / longueurSegments *100 => 21,63931
+environ 22% de segment en longueur n'ont un aménagement que d'un coté
 
