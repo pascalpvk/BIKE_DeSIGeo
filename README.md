@@ -33,6 +33,6 @@ Ces fichiers ont été intégré dans git via l'outil "[Git Large File Storage](
 - Table des longueurs de segment, pour export et traitement dans Tableau (réécriture en CSV du fichier BNAC / Geovelo) : 
   - [france-20211201.csv](etl/france-20211201.csv) (SQL_2.1.1)
 - Table des points extrémités, pour export et traitement dans Tableau : 
-  - [etl/france-20211201-ext-points.csv](etl/france-20211201-ext-points.csv)
+  - [etl/france-20211201-ext-points.csv](france-20211201-ext-points.csv)
 
 # Rep out : Fichiers de résultat
