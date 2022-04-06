@@ -328,12 +328,25 @@ SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueu
 	FROM bike.geovelo
 	WHERE (ame_d = 'AUCUN') AND (ame_g = 'AUCUN');
 
--- SQL_6.2.8 Les Voies Vertes     --  6 segments, longueur linéaire = 1875.03 m, AUCUN à G et à Droite (Bug)
+-- SQL_6.2.8 Les Voies Vertes     XXXXXXXXXX. A EXPLORER. XXXXXXX
+--  OR : 39234 segments, longueur linéaire = 9 142 429.3 m
+-- AND : 37078 segments, longueur linéaire = 8 834 171.26 m
 -- SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueur_seg_un_ame 
+-- 39234   -- AND 37078
 SELECT * 
 	FROM bike.geovelo
-	WHERE (ame_d = 'VOIE VERTE') OR (ame_g = 'VOIE VERTE');
-
+--	WHERE (ame_d = 'VOIE VERTE') AND (ame_g = 'VOIE VERTE');
+	WHERE (ame_d = 'VOIE VERTE') AND (ame_g NOT LIKE 'VOIE VERTE'); -- 2156 seg -- 308 258.04 m
+	-- Pas VV : (bande cyclable unidirectionnelle ) https://www.openstreetmap.org/way/225454718 
+	-- Pas VV : (passage pieton) https://www.openstreetmap.org/way/194345635
+	-- Pas VV : Piste cyclable unidirectionnelle : https://www.openstreetmap.org/way/308765511  
+	-- Pas VV : Permet d'accéder à la VV : https://www.openstreetmap.org/way/307415500  
+	-- Pas VV : (passage pieton) : 568304223 : https://www.openstreetmap.org/way/568304223
+	-- tip : le tag oneway:bicycle semble indiquer l'erreur
+	-- Pas VV : (quelques picto au sol) : https://www.openstreetmap.org/way/33457163
+	-- Pas VV : (quelques picto au sol) : https://www.openstreetmap.org/way/175324865
+	
+--	WHERE (ame_g = 'VOIE VERTE') AND (ame_d NOT LIKE 'VOIE VERTE');  -- Inexistant
 
 
 
