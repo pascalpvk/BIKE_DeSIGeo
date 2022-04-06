@@ -14,7 +14,7 @@ Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
   - SQL_3.1.1
 - Proposition de Poids attribués par type d'aménagement
   - Ce fichier CSV est un export de l'onglet ponderation du [document "Conbinaisons type d'aménagement"](https://docs.google.com/spreadsheets/d/1_bZ3a8YPmeFRE1WyjljdxPkhcoufJF49F1G6NZglBw0/edit?usp=sharing)
-  - [ame_poids.csv]/(src/ame_poids.csv)
+  - [ame_poids.csv](src/ame_poids.csv)
 
 Ces fichiers ont été intégré dans git via l'outil "[Git Large File Storage](https://docs.github.com/en/repositories/working-with-files/managing-large-files)"
 
