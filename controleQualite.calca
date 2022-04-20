@@ -39,3 +39,13 @@ environ 32% des segments  en nombre d'élément n'ont un aménagement que d'un c
 longueurLineaireAmeAucun / longueurSegments *100 => 21,63931
 environ 22% de segment en longueur n'ont un aménagement que d'un coté
 
+
+### Cas des Voies Vertes
+# Ensenmble des segment ayant au moins une voies verte
+segmentAvecVV = 39234
+segmentAvec2VV = 37078
+segmentAvecUneSeuleVV = 2156
+pourcentageUneSeuleVV = segmentAvecUneSeuleVV*100/segmentAvecVV => 5,49523
+pourcentageDeuxVV = segmentAvec2VV*100/segmentAvecVV => 94,50477
+
+1664 *100 / 2156 => 77,17996

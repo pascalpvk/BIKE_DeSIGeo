@@ -1,8 +1,8 @@
----------------------------------------
--- Projet BIKE / DeSIGeo / ENSG
--- 2021-2022      --     Mars 2022
--- Pascal Vuylsteker et David Delord
----------------------------------------
+-------------------------------------------
+--    Projet BIKE / DeSIGeo / ENSG        -
+--    2021-2022   --  Février-Mai 2022    -
+--    Pascal Vuylsteker et David Delord   -
+-------------------------------------------
 -- Analyse des amaganements cyclable décrit dans la BNAC
 -- Base Nationale des Aménagements Cyclables
 -- Exportée à partir de openstreetmap par Geovelo
@@ -10,9 +10,10 @@
 -- ATTENTION
 -- Suite aux tests réalisés en mars 2022, nous avons découvert des erreur dans les champs ame
 -- du fichier produit par Geovelo.
--- Nous avons de fait décidé de revenir au fichier source france-20211201.geojson de décembre 2021
+-- Nous avons alors décidé de revenir au fichier source france-20211201.geojson de décembre 2021
 -- et de réaliser l'ensemble de nos opérations à partir de ce fichier
--- les valeurs correctes estimées sont prefixées de 'was' ou '-- new_dec_2021'
+-- les valeurs correctes estimées sont prefixées de 'was' (quand les données de mars sont affichée) 
+-- ou '-- new_dec_2021' quand il s'agit de nouveau calcul, non encore réalisé en Décembre
 
 -- Alimentation de PostgreSQL par QGIS, après export pour conversion de SRID
 -- BDD de départ : france-20220301_Lambert93.geojson (was france-20211201.geojson) passé par QGis pour être stocké dans bike.geovelo
@@ -20,7 +21,8 @@
 
 
 -- Exploration initial du jeu de donnée
-SELECT postgis_full_version ();  -- Travail réalisé avec POSTGIS="3.1.3 008d2db" [EXTENSION] PGSQL="140" GEOS="3.9.1-CAPI-1.14.2" PROJ="8.0.0" LIBXML="2.9.10" LIBJSON="0.15"
+SELECT postgis_full_version();  -- Travail réalisé avec POSTGIS="3.1.3 008d2db" [EXTENSION] PGSQL="140" GEOS="3.9.1-CAPI-1.14.2" PROJ="8.0.0" LIBXML="2.9.10" LIBJSON="0.15"
+SELECT version(); -- PostgreSQL 14.0 on x86_64-apple-darwin20.6.0, compiled by Apple clang version 12.0.0 (clang-1200.0.32.29), 64-bit
 -- SQL_1.1
 SELECT COUNT(*) FROM bike.geovelo; -- 303880 (was 318852 segements : GeoVelo a ajouté certainnes contraintes sur l'export qui a réduit la quantité de segment)
 -- SQL_1.2
@@ -331,13 +333,27 @@ SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueu
 -- SQL_6.2.8 Les Voies Vertes     XXXXXXXXXX. A EXPLORER. XXXXXXX
 --  OR : 39234 segments, longueur linéaire = 9 142 429.3 m
 -- AND : 37078 segments, longueur linéaire = 8 834 171.26 m
+-- (ame_d = 'VOIE VERTE') AND (ame_g NOT LIKE 'VOIE VERTE'); -- 2156
+-- 37078 + 2156 = 39234 ()
 -- SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueur_seg_un_ame 
 -- 39234   -- AND 37078
-SELECT * 
+SELECT * , round(ST_length(geom)*100)/100 AS longueur
 	FROM bike.geovelo
---	WHERE (ame_d = 'VOIE VERTE') AND (ame_g = 'VOIE VERTE');
-	WHERE (ame_d = 'VOIE VERTE') AND (ame_g NOT LIKE 'VOIE VERTE'); -- 2156 seg -- 308 258.04 m
-	-- Pas VV : (bande cyclable unidirectionnelle ) https://www.openstreetmap.org/way/225454718 
+--	WHERE (ame_d = 'VOIE VERTE') AND (ame_g = 'VOIE VERTE') -- 37078 segments, longueur linéaire = 8 834 171.26 m
+	WHERE (ame_d = 'VOIE VERTE') AND (ame_g NOT LIKE 'VOIE VERTE') -- 2156 seg -- 308 258.04 m
+--	WHERE (ame_d = 'VOIE VERTE') AND (ame_g = 'VOIE VERTE') 
+--		AND ((sens_d = 'BIDIRECTIONNEL') OR (sens_g = 'BIDIRECTIONNEL')); -- 0 segments, longueur linéaire = 0 m
+--	WHERE (ame_d = 'VOIE VERTE') AND (ame_g NOT LIKE 'VOIE VERTE') 
+--		AND ((sens_d = 'BIDIRECTIONNEL') ); -- 0 segments, longueur linéaire = 0 m
+--		AND ((sens_d = 'UNIDIRECTIONNEL') ); -- 2156 seg -- 308 258.04 m
+	ORDER BY round(ST_length(geom)*100)/100   DESC;
+
+-- SQL_6.2.9 -- 1664 segments de moins de 200m pour 91,635 km
+SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueur_seg_un_ame
+	FROM bike.geovelo
+	WHERE (ame_d = 'VOIE VERTE') AND (ame_g NOT LIKE 'VOIE VERTE') AND (round(ST_length(geom)*100)/100 < 200)
+	
+-- Pas VV : (bande cyclable unidirectionnelle ) https://www.openstreetmap.org/way/225454718 
 	-- Pas VV : (passage pieton) https://www.openstreetmap.org/way/194345635
 	-- Pas VV : Piste cyclable unidirectionnelle : https://www.openstreetmap.org/way/308765511  
 	-- Pas VV : Permet d'accéder à la VV : https://www.openstreetmap.org/way/307415500  
