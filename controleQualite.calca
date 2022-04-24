@@ -6,9 +6,12 @@
 
 ### Le nombre total de communes en contact avec des aménagements cyclables
 13 230 /  34 825 * 100 => 37,98995
- 
- 
-## 
+12957 /  34 825 * 100 => 37,20603
+
+13 230-12 957 => 273
+Hypothèse: 273 communes sont adjacentes à une chaussée équipée d'un aménagement cyclable du coté de la commune voisine, mais ne sont pas elle  équipé du moindre aménagement cyclable
+Cf SQL_6.4.4 et SQL_1.4
+
 nbSegments = 318 852
 longueurSegments = 61 862 994,64m
 longueurLineaireAvantNettoyage = 123 725 990m
@@ -60,5 +63,12 @@ GVV = 19 954 km
 GBandes = 14 288 km
 GDoubleSens = 4 639 km
 GBus = 926 km
+BPistes = 35 106 km
+BVV = 17 976 km
+BBandes = 13 593 km
+BDoubleSens = 3 445 km + 1 089 km => 4 534 km
+BBus = 887 km
 GAffiche = GPistes+ GVV+ GBandes+ GDoubleSens + GBus => 74 369 km
-
+BAffiche = BPistes + BVV + BBandes + BDoubleSens + BBus => 72 096 km
+En Avril 2022 vs Décembre 2021:
+(GAffiche-BAffiche)*100/BAffiche => 3,15274

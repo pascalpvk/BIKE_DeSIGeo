@@ -492,8 +492,6 @@ SELECT * FROM bike.geovelo_total;  -- mars22 : 12342 -- new_dec_2021 12957
 
 -- Table: bike.poids
 -- DROP TABLE bike.poids;
--- SQL_7
-DROP TABLE IF EXISTS bike.poids;  
 CREATE TABLE IF NOT EXISTS bike.poids
 (
     ame character varying(60) COLLATE pg_catalog."default",
@@ -505,7 +503,6 @@ SELECT * FROM bike.poids;
 -- JUNCTION PRINCIPALE
 -- junction geovelo_simple avec table commune et table poid et geovelo_total
 -- CONSERVATION par AME pour l'instant
--- SQL_7.1
 DROP TABLE IF EXISTS bike.geovelo_poids;
 CREATE TABLE bike.geovelo_poids AS (
 	SELECT a.ame, a.lineaire_cyclable, a.longueur_voie, t.lineaire_total, 
@@ -516,14 +513,11 @@ CREATE TABLE bike.geovelo_poids AS (
 	WHERE (a.code_com = t.code_com) AND (c.depcom = a.code_com) AND (p.ame = a.ame) AND (c.dep = d.dep)
 	ORDER BY t.lineaire_total DESC, a.lineaire_cyclable DESC
 );
--- SQL_7.1.1
 SELECT * FROM bike.geovelo_poids;
-SELECT COUNT(*) FROM bike.geovelo_poids GROUP BY code_com; -- 12895 -- Il y a de la perte 62 communes XXXXX
--- liée à la base commune / budget qui est un peu vielle : 2018
 
 -- Petit control test sur les cas execeptionnels de budget par habitant
 select * FROM bike.departement;
-SELECT * FROM bike.geovelo_poids WHERE commune LIKE 'VAU%' ORDER BY lineaire_total DESC, lineaire_cyclable DESC;
+SELECT * FROM bike.geovelo_poids WHERE commune LIKE '%VAU%' ORDER BY lineaire_total DESC, lineaire_cyclable DESC;
 -- Découverte en phase de visualisation : VAUJANY - La ville de Vaujany a 322 habitants
 -- La ville de France ayant le rapport budgt(produits_total/population le plus élevé)
 -- https://www.ledauphine.com/isere-sud/2010/02/01/oisans-gros-endettement-mais-grosses-recettes
@@ -547,19 +541,17 @@ DELETE FROM bike.geovelo_poids WHERE lineaire_pondere <0.01;  -- Deux (2) valeur
 
 -- Export contenant tous les type d'aménagement en mode linéaire
 -- DANGER la valeur longueur voie n'est pas correcte ici!! (elle a été doublé )
--- et de toute façcon, elle n esert plus ici. Ce qui compte c'est les linéaires
 COPY bike.geovelo_poids TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/geovelo_poids.csv' DELIMITER ',' CSV HEADER; 
 
 
 --- total par ame
 SELECT * FROM bike.geovelo_poids ORDER BY lineaire_total DESC, lineaire_cyclable DESC;
 
--- XXXXXXXXXXXXXXXXXXXXXXX.  A COMPARER AVEC SQL_7.1.1  XXXXXXXXXXXXXXXXXXXXXX
 ---   total pondere par ville (on regroupe les aménagement en un total pondéré par commune)
 SELECT code_com, commune, dep, 
 	ROUND(SUM(lineaire_pondere)*100)/100 AS lineaire_pondere_total,
 	ROUND(SUM(lineaire_cyclable)*100)/100 AS lineaire_total,
-	ROUND(AVG(lineaire_total)*100)/100 as lineaire_total2 -- XXXXXXXXXXXX
+	ROUND(SUM(lineaire_cyclable)*100)/100 AS lineaire_total      -- XXXXXXXXXXXX
 FROM bike.geovelo_poids
 GROUP BY code_com, commune, dep
 ORDER BY SUM(lineaire_pondere) DESC;
@@ -581,5 +573,165 @@ GROUP BY dep
 ORDER BY SUM(lineaire_pondere) DESC;
 
 SELECT c.depcom, c.commune FROM bike.budget c
+
+
+-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+SELECT SUM(nombre) FROM bike.geovelo_two_sides; --318 852
+SELECT SUM(nombre) FROM bike.geovelo_two_sides gg WHERE gg.droite = gg.gauche; -- 304 808
+
+SELECT COUNT(*), gg.code_com_d, gg.code_com_g 
+FROM bike.geovelo gg 
+GROUP BY gg.code_com_d, gg.code_com_g 
+HAVING gg.code_com_d = gg.code_com_g;
+
+SELECT * FROM bike.geovelo gg WHERE (gg.code_com_g='91471' OR gg.code_com_d='91471');
+SELECT code_com_g, code_com_d FROM bike.geovelo gg WHERE gg.code_com_g IS NULL AND gg.code_com_d IS NULL ORDER BY code_com_d;
+
+SELECT COUNT(*),SUM(ST_length(geom)) , gg.ame_d, gg.ame_g 
+FROM bike.geovelo gg 
+GROUP BY gg.ame_d, gg.ame_g
+ORDER BY COUNT(*) DESC;
+
+SELECT COUNT(*), gg.ame_d 
+FROM bike.geovelo gg 
+GROUP BY gg.ame_d
+ORDER BY COUNT(*) DESC;
+
+SELECT SUM(ST_Length(gg.geom)), gg.ame_d 
+FROM bike.geovelo gg 
+GROUP BY gg.ame_d
+ORDER BY SUM(ST_Length(gg.geom)) DESC;
+
+SELECT SUM(ST_Length(gg.geom)), gg.ame_g 
+FROM bike.geovelo gg 
+GROUP BY gg.ame_d
+ORDER BY SUM(ST_Length(gg.geom)) DESC;
+-- HAVING gg.code_com_d = gg.code_com_g;
+-- HAVING gg.code_com_d = gg.code_com_g;
+
+
+-- hc : highway=cycleway : piste cyclable
+-- cc : cycleway=* : bande cyclable
+-- vv : Voie Vertes
+-- pa : path
+
+-- seg : nombre de segment km : longueur en km
+
+
+
+
+
+
+
+--------------------------- Code de début de Projet, avec des imports OSM par QuickOSM
+-- FRANCE
+-- En France, geopackage venant de demo.osm
+-- Stockage résultats
+UPDATE bike.resultats SET valeur= (
+	SELECT COUNT(*) FROM bike.geovelo -- OSM : 66630 Geovelo: 318852
+)
+WHERE ref ILIKE 'fr_hc_seg';
+
+UPDATE bike.resultats SET valeur= (
+	SELECT SUM(ST_length(geom)) FROM bike.geovelo -- OSM 214km !!! Geovelo 695m !! Devrait être 73 406 km
+)
+WHERE ref ILIKE 'fr_hc_km';
+
+UPDATE bike.resultats SET valeur= (
+	SELECT COUNT(*) FROM bike.geovelo -- 61205
+)
+WHERE ref ILIKE 'fr_cc_seg';
+
+UPDATE bike.resultats SET valeur= (
+	SELECT SUM(ST_length(geom)) FROM bike.geovelo  -- 110km
+)
+WHERE ref ILIKE 'fr_cc_km';
+
+
+-- DEPARTEMENT : Zone tempon autour du département (selection rectanglaire large sour QuickOSM)
+
+-- Stockage des résultats intermédiaires (dans le sens: "zone large autour du département")
+-- Export utilisant le plugin Quick OSM avec le critère "highway=cycleway"
+UPDATE bike.resultats SET valeur= (
+	 -- 7026 : Essonne
+	SELECT COUNT(*) FROM bike.highway_cycleway_autour_dep
+)
+WHERE (ref ILIKE 'dep_hc_seg') AND (dep IS NULL);
+UPDATE bike.resultats SET valeur= (
+	 -- 15,74 km : Essonne
+	SELECT SUM(ST_length(geom)) FROM bike.highway_cycleway_autour_dep
+)
+WHERE (ref ILIKE 'dep_hc_km') AND (dep IS NULL);
+
+-- Export utilisant le plugin Quick OSM avec le critère "cycleway=*" (et zone plus large)
+UPDATE bike.resultats SET valeur= (
+	 -- 15180 : Essonne
+	SELECT COUNT(*) FROM bike.cycleway_osm_autour_dep
+)
+WHERE (ref ILIKE 'dep_cc_seg') AND (dep IS NULL);
+UPDATE bike.resultats SET valeur= (
+	 -- 26,09 km : Essonne
+	SELECT SUM(ST_length(geom)) FROM bike.cycleway_osm_autour_dep
+)
+WHERE (ref ILIKE 'dep_cc_km') AND (dep IS NULL);
+
+
+
+
+
+SELECT code_insee, nom, wikipedia, surf_km2 FROM bike.departements
+ORDER BY code_insee ASC 
+
+-- RESTRICTION AU DEPARTEMENT EN COUR D'ETUDE et projection du nombre de dimension (selection des colonnes)
+
+
+-- Table contenant les "higway=cicleway" d'un unique département
+DROP TABLE IF EXISTS bike.hc_osm_dept;
+CREATE TABLE bike.hc_osm_dept AS (
+	SELECT hc.id, hc.geom, hc.highway, hc.full_id, hc.osm_id, hc.osm_type, hc.cycleway, 
+	hc.name, hc.small_electric_vehicle, hc.oneway, hc.maxspeed, hc.lanes,
+	hc.width, hc.surface, hc.segregated, hc.foot,
+	d.code_insee, d.nom, d.surf_km2
+	FROM bike.highway_cycleway_autour_dep hc, bike.departements d
+	WHERE (d.code_insee ILIKE (SELECT dep FROM bike.dep)
+		  ) AND ST_Intersects(hc.geom, d.geom)
+);
+
+-- Table contenant les "cicleway=*" d'un unique département
+DROP TABLE IF EXISTS bike.cc_osm_dept;
+CREATE TABLE bike.cc_osm_dept AS (
+	SELECT cc.id, cc.geom, cc.highway, cc.full_id, cc.osm_id, cc.osm_type, cc.cycleway, 
+	cc.name, cc.small_electric_vehicle, cc.oneway, cc.maxspeed, cc.lanes,
+	cc.width, cc.surface, cc.segregated, cc.foot,
+	d.code_insee, d.nom, d.surf_km2
+	FROM bike.cycleway_osm_autour_dep cc, bike.departements d
+	WHERE (d.code_insee ILIKE (SELECT dep FROM bike.dep)
+		  ) AND ST_Intersects(cc.geom, d.geom)
+);
+
+
+
+-- Restriction à un departement vs. autour du département
+SELECT COUNT(*) FROM bike.hc_osm_dept -- 1348/7026
+SELECT SUM(ST_length(geom)) FROM bike.hc_osm_dept; -- 3,64km / 15,74 km
+SELECT COUNT(*) FROM bike.cc_osm_dept -- 1659 / 15180
+SELECT SUM(ST_length(geom)) FROM bike.cc_osm_dept; -- 2,8km/26,09 km
+
+select UpdateGeometrySRID('pvk','hc_osm_dept','geom',4326)
+SELECT ST_Length(hc.geom) FROM bike.hc_osm_dept hc
+SELECT ST_length(geom) FROM bike.piste_cyclable22
+
+-- Stockage des résultats intermédiaires (dans le sens: "zone large autour du département")
+-- Export utilisant le plugin Quick OSM avec le critère "highway=cycleway"
+UPDATE bike.resultats SET valeur= (
+	 -- 7026 : Essonne
+	SELECT COUNT(*) FROM bike.highway_cycleway_autour_dep
+)
+WHERE (ref ILIKE 'dep_hc_seg') AND (dep IS NULL);
+
 
 
