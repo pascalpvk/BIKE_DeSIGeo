@@ -297,7 +297,8 @@ CREATE TABLE bike.geovelo_simple_cote AS (
 	FROM bike.geovelo gg 
 	GROUP BY gg.ame_d, gg.sens_d, gg.code_com_d
 );
-SELECT COUNT(*) FROM bike.geovelo_simple_cote; -- 64066 (was 63466)  -- Type d'amenagement par commune
+SELECT * FROM bike.geovelo_simple_cote;
+SELECT COUNT(*) FROM bike.geovelo_simple_cote; -- 64066 (was 63466)  -- Type d'amenagement par commune (double parfois!)
 -- verification : total = G + D 
 
 -- SQL_6.2.4 -- Vérification des totaux (avant nettoyage, les linéaires sont le double des segments)
@@ -320,13 +321,15 @@ SELECT *
 );
 	
 
--- Double vérification sur la table d'origine   nb Segment un ame : 101690 -- lineaire = 13 384 852.94 m
+-- Double vérification sur la table d'origine  :
+-- nb de Segments avec au plus un amenagement : 101690 -- lineaire = 13 384 852.94 m
 -- SQL_6.2.6
 SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueur_seg_un_ame 
 	FROM bike.geovelo
 	WHERE (ame_d = 'AUCUN') OR (ame_g = 'AUCUN');
 
 -- SQL_6.2.7     --  6 segments, longueur linéaire = 1875.03 m, AUCUN à G et à Droite (Bug)
+-- BUG des sans aménagements
 SELECT COUNT(*) AS nb_seg_un_ame, round(SUM(ST_length(geom)*100))/100 AS longueur_seg_un_ame 
 -- SELECT * 
 	FROM bike.geovelo
@@ -385,17 +388,22 @@ ALTER TABLE bike.geovelo_simple_cote ADD COLUMN lineaire double precision;
 UPDATE bike.geovelo_simple_cote SET lineaire = longueur WHERE sens='UNIDIRECTIONNEL';  -- 56179
 UPDATE bike.geovelo_simple_cote SET lineaire = (longueur*2) WHERE sens='BIDIRECTIONNEL'; -- 301
 
+SELECT count(*), ame_d, code_com_d, ame_g, code_com_g FROM bike.geovelo WHERE (sens_d='BIDIRECTIONNEL') OR (sens_g='BIDIRECTIONNEL') 
+GROUP BY ame_d, code_com_d, ame_g, code_com_g ;
+
 SELECT * FROM bike.geovelo_simple_cote;
 SELECT count(*) FROM bike.geovelo_simple_cote; -- mars22 : 57048   -- new_dec_2021 56480
-
+-- Attention, ce décompte est sans doute double à ce stade
+SELECT count(*) FROM bike.geovelo_simple_cote WHERE sens='BIDIRECTIONNEL'; --301
 
 ----  CONTROLER A PARTIR D"ICI XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 -- à comparer à https://randovelo.touteslatitudes.fr/lineaire-amecycl/
 -- table des linéaires par amenagement et code commune
 -- Le passage de geovelo_simple_cote a geovelo_simple revient à addtitionner les longueurs 
 -- gauche et droite pour chaque couple commune/amenagement
--- (Dans geovelo_simple_cote, ils pouvaient occuper deux ligne)
--- SQL_6.4
+-- (Dans geovelo_simple_cote, ils pouvaient occuper deux lignes)
+-- SQL_6.4.1
 DROP TABLE IF EXISTS bike.geovelo_simple;
 CREATE TABLE bike.geovelo_simple AS (
 	SELECT ROUND(SUM(gg.longueur)*100)/100 AS longueur_voie, ROUND(SUM(gg.lineaire)*100)/100 AS lineaire_cyclable, 
@@ -406,10 +414,20 @@ CREATE TABLE bike.geovelo_simple AS (
 );
 SELECT * FROM bike.geovelo_simple;
 
+-- SQL_6.4.1
+-- Les chiffres brutes les plus objectifs
+-- Linéaire total d'aménagement en France métropolitaine (et en m)
+-- Résultats présentés dans Onglet "linéaire France" de 
+-- https://docs.google.com/spreadsheets/d/1_bZ3a8YPmeFRE1WyjljdxPkhcoufJF49F1G6NZglBw0/edit?usp=sharing
 SELECT gg.ame AS amenagement, SUM(gg.lineaire_cyclable) FROM bike.geovelo_simple gg
 GROUP BY gg.ame ORDER BY SUM(gg.lineaire_cyclable) DESC;
 
 -- Verification debug -- 239 communes / 30251  on un linéaire cyclable  différent de la longueur des aménagements ()
+-- Il s'agit des communes disposant d'aménagement bidirectionnel (hors VV)
+-- à comparer avec les 301 du résultat SQL_6.3.2
+-- La différence s'explique par le fait que dans SQL_6.3.2 des communes apparaissent encore deux fois.
+-- Il y a donc 301-239 = 62 communes ayants au moins un segment présentant des linéaires cyclables bidirectionels
+-- des deux cotés
 	SELECT ROUND(SUM(gg.longueur)*100)/100 AS longueur_voie, ROUND(SUM(gg.lineaire)*100)/100 AS lineaire_cyclable, 
 		gg.code_com AS code_com
 	FROM bike.geovelo_simple_cote gg 
