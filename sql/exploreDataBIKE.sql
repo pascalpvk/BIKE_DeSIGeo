@@ -280,6 +280,8 @@ CREATE TABLE bike.geovelo_simple_cote AS (
 SELECT COUNT(*) FROM bike.geovelo_simple_cote; -- 30089 (was 29748)
 
 -- UNION des deux cotés Ajout des deux cotés dans une table unique PAR COMMUNE
+-- Dans cette table, les aménagements apparaissent potentiellement deux fois par commune
+-- On les regroupera dans la table crée plus tard : geovelo_simple
 -- SQL_6.2.3
 DROP TABLE IF EXISTS bike.geovelo_simple_cote;
 CREATE TABLE bike.geovelo_simple_cote AS (
@@ -383,13 +385,17 @@ ALTER TABLE bike.geovelo_simple_cote ADD COLUMN lineaire double precision;
 UPDATE bike.geovelo_simple_cote SET lineaire = longueur WHERE sens='UNIDIRECTIONNEL';  -- 56179
 UPDATE bike.geovelo_simple_cote SET lineaire = (longueur*2) WHERE sens='BIDIRECTIONNEL'; -- 301
 
-
 SELECT * FROM bike.geovelo_simple_cote;
 SELECT count(*) FROM bike.geovelo_simple_cote; -- mars22 : 57048   -- new_dec_2021 56480
+
 
 ----  CONTROLER A PARTIR D"ICI XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 -- à comparer à https://randovelo.touteslatitudes.fr/lineaire-amecycl/
 -- table des linéaires par amenagement et code commune
+-- Le passage de geovelo_simple_cote a geovelo_simple revient à addtitionner les longueurs 
+-- gauche et droite pour chaque couple commune/amenagement
+-- (Dans geovelo_simple_cote, ils pouvaient occuper deux ligne)
+-- SQL_6.4
 DROP TABLE IF EXISTS bike.geovelo_simple;
 CREATE TABLE bike.geovelo_simple AS (
 	SELECT ROUND(SUM(gg.longueur)*100)/100 AS longueur_voie, ROUND(SUM(gg.lineaire)*100)/100 AS lineaire_cyclable, 
@@ -399,6 +405,9 @@ CREATE TABLE bike.geovelo_simple AS (
 	ORDER BY code_com, SUM(gg.lineaire) DESC
 );
 SELECT * FROM bike.geovelo_simple;
+
+SELECT gg.ame AS amenagement, SUM(gg.lineaire_cyclable) FROM bike.geovelo_simple gg
+GROUP BY gg.ame ORDER BY SUM(gg.lineaire_cyclable) DESC;
 
 -- Verification debug -- 239 communes / 30251  on un linéaire cyclable  différent de la longueur des aménagements ()
 	SELECT ROUND(SUM(gg.longueur)*100)/100 AS longueur_voie, ROUND(SUM(gg.lineaire)*100)/100 AS lineaire_cyclable, 

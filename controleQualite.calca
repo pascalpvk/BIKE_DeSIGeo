@@ -29,6 +29,7 @@ longueurLineaireAmeAucun / longueurLineaireAvantNettoyage *100 => 10,81966
 environ 11% de linéaire en longueur
 
 ### Il y a plus de sens à donner le pourcentage en fonction des segments
+
 Il n'existe pas de segment avec ame_d=ame_g = 'AUCUN'
 (En réalité en Décembre 2021, il existait 6 segments caractérisé de tel sorte !)
 Donc on s'intéresse au pourcentage de segments ayant uniquement un coté aucun
@@ -40,8 +41,9 @@ longueurLineaireAmeAucun / longueurSegments *100 => 21,63931
 environ 22% de segment en longueur n'ont un aménagement que d'un coté
 
 
-### Cas des Voies Vertes
-# Ensenmble des segment ayant au moins une voies verte
+# Cas des Voies Vertes
+
+## Ensemble des segments ayant au moins une voies verte
 segmentAvecVV = 39234
 segmentAvec2VV = 37078
 segmentAvecUneSeuleVV = 2156
@@ -49,3 +51,14 @@ pourcentageUneSeuleVV = segmentAvecUneSeuleVV*100/segmentAvecVV => 5,49523
 pourcentageDeuxVV = segmentAvec2VV*100/segmentAvecVV => 94,50477
 
 1664 *100 / 2156 => 77,17996
+
+# Geovelo
+
+## Stats des aménagement cyclables
+GPistes = 34 562 km
+GVV = 19 954 km
+GBandes = 14 288 km
+GDoubleSens = 4 639 km
+GBus = 926 km
+GAffiche = GPistes+ GVV+ GBandes+ GDoubleSens + GBus => 74 369 km
+
