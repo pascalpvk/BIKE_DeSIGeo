@@ -522,7 +522,7 @@ SELECT COUNT(*) FROM bike.geovelo_poids GROUP BY code_com; -- 12895 -- Il y a de
 -- liée à la base commune / budget qui est un peu vielle : 2018
 
 -- Petit control test sur les cas execeptionnels de budget par habitant
-select * FROM bike.departement;
+SELECT * FROM bike.departement;
 SELECT * FROM bike.geovelo_poids WHERE commune LIKE 'VAU%' ORDER BY lineaire_total DESC, lineaire_cyclable DESC;
 -- Découverte en phase de visualisation : VAUJANY - La ville de Vaujany a 322 habitants
 -- La ville de France ayant le rapport budgt(produits_total/population le plus élevé)
@@ -555,14 +555,37 @@ COPY bike.geovelo_poids TO '/Users/pascalvuylsteker/DESIGEO_HOME/ProjetBIKE/geov
 SELECT * FROM bike.geovelo_poids ORDER BY lineaire_total DESC, lineaire_cyclable DESC;
 
 -- XXXXXXXXXXXXXXXXXXXXXXX.  A COMPARER AVEC SQL_7.1.1  XXXXXXXXXXXXXXXXXXXXXX
+-- SQL_7.1.2
 ---   total pondere par ville (on regroupe les aménagement en un total pondéré par commune)
 SELECT code_com, commune, dep, 
 	ROUND(SUM(lineaire_pondere)*100)/100 AS lineaire_pondere_total,
 	ROUND(SUM(lineaire_cyclable)*100)/100 AS lineaire_total,
-	ROUND(AVG(lineaire_total)*100)/100 as lineaire_total2 -- XXXXXXXXXXXX
+	ROUND(AVG(lineaire_total)*100)/100 as lineaire_total2 -- lineaire_total et lineaire_total2 sont a peu près identiques, aux arrondis
 FROM bike.geovelo_poids
 GROUP BY code_com, commune, dep
 ORDER BY SUM(lineaire_pondere) DESC;
+
+--SQL_7.1.3 Classement par facteur_qualite 
+-- Les petites structures s'en sorte très bien
+SELECT code_com, commune, dep, 
+	ROUND(SUM(lineaire_pondere)*100)/100 AS lineaire_pondere_total,
+	ROUND(SUM(lineaire_cyclable)*100)/100 AS lineaire_total,
+	ROUND(100*SUM(lineaire_pondere)/SUM(lineaire_cyclable)) AS facteur_qualite
+FROM bike.geovelo_poids
+GROUP BY code_com, commune, dep
+ORDER BY ROUND(100*SUM(lineaire_pondere)/SUM(lineaire_cyclable)) DESC;
+
+--SQL_7.1.4 Classement par facteur_qualite mis à l'échelle du rapport de la longueur linéaire pondéré la plus importante
+-- le coeff de toulouse est multiplié par 1, alors que les petits linéaires sont multipliés par un faible coefficient
+-- 
+SELECT code_com, commune, dep, 
+	ROUND(SUM(lineaire_pondere)*100)/100 AS lineaire_pondere_total,
+	ROUND(SUM(lineaire_cyclable)*100)/100 AS lineaire_total,
+	ROUND(100*SUM(lineaire_pondere)/674830) AS facteur_qualite_Biais
+FROM bike.geovelo_poids
+WHERE commune ILIKE '%PARIS%'
+GROUP BY code_com, commune, dep
+ORDER BY ROUND(100*SUM(lineaire_pondere)/674830) DESC;
 
 ---   total pondere par ville avec facteur qualité (rapport pondéré/non pondéré)
 SELECT code_com, commune, dep, ROUND(SUM(lineaire_pondere)/SUM(lineaire_cyclable)*100) AS facteur_qualite, 
