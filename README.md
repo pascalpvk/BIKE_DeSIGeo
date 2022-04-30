@@ -1,6 +1,11 @@
 # BIKE_DeSIGeo
 Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
 
+# Rep sql : Scripts SQL
+- ETL SQL principal : L'ensemble des instructions de création des tables : 
+  - [exploreDataBIKE.sql](sql/exploreDataBIKE.sql)
+
+
 ## Fichiers de résultat sur git, Dropbox et GDrive
 - Calculs simples réalisés sous l'application Calca
   - [controleQualite.calca](controleQualite.calca)  
@@ -9,10 +14,6 @@ Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
   - [Présentation Principale, avec deux dashboards](https://www.dropbox.com/s/bf2nbxcp8r3tlvz/BIKE-Tableau.twbx?dl=0)
   - [Diagramme de Parreto des segments exportés](https://www.dropbox.com/s/95nhwscq490ev3c/BIKE-Tableau-geovelo-length.twbx?dl=0)
   - [Carte de France avec largeur des aménagements proportionnelle à leur Qualité](https://www.dropbox.com/s/hfwha35xzf1wjd4/BIKE-Tableau-geovelo-carteDeFrance.twbx?dl=0)
-
-# Rep sql : Scripts SQL
-- ETL SQL principal : L'ensemble des instructions de création des tables : 
-  - [exploreDataBIKE.sql](sql/exploreDataBIKE.sql)
 
 
 ## Rep etl : Fichiers Intermédiaires de Transformation
