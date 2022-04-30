@@ -21,6 +21,9 @@ Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
 - Table des points extrémités, pour export et traitement dans Tableau : 
   - [etl/france-20211201-ext-points.csv](france-20211201-ext-points.csv)
 
+# Bookmarkographie
+- Liste de lien récoltés durant ce projet
+
 
 ## Rep src : Fichiers Sources
 - Fichier principal : export BNAC / Geovelo datant de décembre 2021 : 
