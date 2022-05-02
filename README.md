@@ -51,10 +51,12 @@ Ces fichiers ont été intégré dans git via l'outil "[Git Large File Storage](
 - Départements
   - [src/insee/cog_ensemble_2021_csv/departement2021.csv](src/insee/cog_ensemble_2021_csv/departement2021.csv) 
 
-## Rep Rstudio : Script Rstudio et principaux résultats (https://github.com/pascalpvk/BIKE_DeSIGeo/tree/main/Rstudio)
+## Rep Rstudio : Script Rstudio et principaux résultats [Rstudio](https://github.com/pascalpvk/BIKE_DeSIGeo/tree/main/Rstudio)
 - Script Rstudio
 - Principaux plots obtenus
+  - [PLOT]
 - Principales ACP obtenues
+  - [ACP](https://github.com/pascalpvk/BIKE_DeSIGeo/tree/main/Rstudio/ACP_resultats)
 
 
 
