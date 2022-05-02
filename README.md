@@ -1,7 +1,7 @@
 # BIKE_DeSIGeo
 Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
 
-# Rep sql : Scripts SQL
+## Rep sql : Scripts SQL
 - ETL SQL principal : L'ensemble des instructions de création des tables : 
   - [exploreDataBIKE.sql](sql/exploreDataBIKE.sql)
 
