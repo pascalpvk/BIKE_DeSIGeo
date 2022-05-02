@@ -53,7 +53,7 @@ Ces fichiers ont été intégré dans git via l'outil "[Git Large File Storage](
 
 ## Rep Rstudio : Script Rstudio et principaux résultats
 - Script Rstudio
-  - [SCRIPT](https://github.com/pascalpvk/BIKE_DeSIGeo/tree/main/Rstudio/projet_continuite)
+  - [SCRIPT](https://github.com/pascalpvk/BIKE_DeSIGeo/blob/main/Rstudio/projet_continuite.R)
 - Principaux plots obtenus
   - [PLOT](https://github.com/pascalpvk/BIKE_DeSIGeo/tree/main/Rstudio/Plot_resultats)
 - Principales ACP obtenues
