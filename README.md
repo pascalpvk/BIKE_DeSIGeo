@@ -3,6 +3,10 @@ Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
 
 [Rapport final](Etude_qualitative_des_pistes_cyclables_de_France.pdf) : [Etude qualitative des pistes cyclables de France ](Etude_qualitative_des_pistes_cyclables_de_France.pdf)
 
+### Présentation
++ [Version pdf des slides](BIKE_presentation_V5.pdf)
++ [Version pptx des slides](BIKE_presentation_V5.pptx)
+
 ## Rep sql : Scripts SQL
 - ETL SQL principal : L'ensemble des instructions de création des tables : 
   - [exploreDataBIKE.sql](sql/exploreDataBIKE.sql)
