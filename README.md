@@ -6,6 +6,7 @@ Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
 ### Présentation
 + [Version pdf des slides](BIKE_presentation_V5.pdf)
 + [Version pptx des slides](BIKE_presentation_V5.pptx)
++ [Slides + Notes](Notes_Presentation_BIKE_V5.pdf)
 
 ## Rep sql : Scripts SQL
 - ETL SQL principal : L'ensemble des instructions de création des tables : 
