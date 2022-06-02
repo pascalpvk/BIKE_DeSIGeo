@@ -5,6 +5,10 @@ Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
 
 [Rapport final](Etude_qualitative_des_pistes_cyclables_de_France.pdf) : [Etude qualitative des pistes cyclables de France ](Etude_qualitative_des_pistes_cyclables_de_France.pdf)
 
+### Equipe Projet
++ [David Delord](https://github.com/daviddelord38) - [David.Delord@ensg.eu](mailto:David.Delord@ensg.eu)
++ [Pascal Vuylsteker](https://github.com/pascalpvk) - [Pascal.Vuylsteker@ensg.eu](mailto:Pascal.Vuylsteker@ensg.eu)
+
 ### Présentation rapide (résumé)
 + [Version pdf des slides](BIKE_presentation_V5.pdf)
 + [Version pptx des slides](BIKE_presentation_V5.pptx)
