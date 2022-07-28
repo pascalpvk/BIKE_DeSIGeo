@@ -3,6 +3,9 @@ Projet BIKE pour le Mastère DeSIGeo ENSG CNAM
 
 ### Étude qualitative et quantitative despistes cyclables en France
 
+Nous chercherons dans ce projet à établir la qualité du réseau des aménagements cyclables en France et en particulier
+à évaluer la continuité de celles-ci.
+
 ## [Rapport complet](Etude_qualitative_des_pistes_cyclables_de_France.pdf)
 
 [Rapport final](Etude_qualitative_des_pistes_cyclables_de_France.pdf) : [Etude qualitative des pistes cyclables de France ](Etude_qualitative_des_pistes_cyclables_de_France.pdf)
